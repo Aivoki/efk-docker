@@ -5,7 +5,7 @@ services:
         image: ${ELASTICSEARCH_IMAGE}
         restart: always
         environment:
-            - 'node.name=HEYJUDE'
+            - 'node.name=INEP'
             - 'discovery.type=single-node'
             - 'bootstrap.memory_lock=true'
             - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
@@ -14,10 +14,10 @@ services:
             - 9300:9300
         volumes:
             - type: bind
-              source: /var/lib/elasticsearch
+              source: ./elasticsearch
               target: /usr/share/elasticsearch/data
         networks:
-            - net
+            - efk
         logging:
             driver: fluentd
             options:
@@ -32,8 +32,9 @@ services:
         restart: always
         ports:
             - 5601:5601
+            - 443:5601
         networks:
-            - net
+            - efk
         depends_on:
             - elasticsearch
         logging:
@@ -49,16 +50,39 @@ services:
         image: ${FLUENTD_IMAGE}
         ports:
             - 127.0.0.1:24224:24224
+            - 8080:24224
 #            - 24224:24224/udp
         volumes:
             - ./fluentd/etc:/fluentd/etc
         networks:
-            - net
+            - efk
         logging:
             driver: "json-file"
             options:
                 max-size: "1G"
                 max-file: "2"
+
+    apm:
+        image: ${APMSERVER_IMAGE}
+        ports:
+            - 8200:8200
+        networks:
+            - efk
+        depends_on:
+            - elasticsearch
+            - kibana
+        logging:
+            driver: fluentd
+            options:
+                fluentd-address: localhost:24224
+                fluentd-async-connect: 'true'
+                fluentd-retry-wait: '1s'
+                fluentd-max-retries: '30'
+                tag: ${LOG_OPT_TAG_PREFIX}.efk.apm
+        volumes:
+            - type: bind
+              source: ./apm-server/conf/apm-server.yml
+              target: /usr/share/apm-server/apm-server.yml
 
     nginx:
         image: ${NGINX_IMAGE}
@@ -75,7 +99,7 @@ services:
               target: /etc/nginx/conf.d
               read_only: true
         networks:
-            - net
+            - efk
         depends_on:
             - kibana
         logging:
@@ -87,5 +111,5 @@ services:
                 fluentd-max-retries: '30'
                 tag: ${LOG_OPT_TAG_PREFIX}.efk.nginx
 networks:
-    net:
+    efk:
         driver: bridge

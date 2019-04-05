@@ -1,8 +1,9 @@
 COMPOSE_PROJECT_NAME=efk
 
-ELASTICSEARCH_IMAGE=docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.0
-KIBANA_IMAGE=docker.elastic.co/kibana/kibana-oss:6.3.0
-FLUENTD_IMAGE=qqbuby/fluentd:v1.2-es
-NGINX_IMAGE=nginx:1.13
+ELASTICSEARCH_IMAGE=registry.inep.gov.br/infra/elasticsearch
+KIBANA_IMAGE=registry.inep.gov.br/infra/kibana
+FLUENTD_IMAGE=registry.inep.gov.br/infra/fluentd
+APMSERVER_IMAGE=registry.inep.gov.br/infra/apm-server
+NGINX_IMAGE=registry.inep.gov.br/infra/nginx
 
 LOG_OPT_TAG_PREFIX=alpha
