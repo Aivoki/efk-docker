@@ -47,7 +47,7 @@ services:
                 tag: ${LOG_OPT_TAG_PREFIX}.efk.kibana
 
     fluentd:
-        image: ${FLUENTD_IMAGE}
+            build: ./fluentd
         ports:
             - 127.0.0.1:24224:24224
             - 8080:24224
@@ -80,9 +80,7 @@ services:
                 fluentd-max-retries: '30'
                 tag: ${LOG_OPT_TAG_PREFIX}.efk.apm
         volumes:
-            - type: bind
-              source: ./apm-server/conf/apm-server.yml
-              target: /usr/share/apm-server/apm-server.yml
+            - ./apm-server/conf/apm-server.yml:/usr/share/apm-server/apm-server.yml
 
     nginx:
         image: ${NGINX_IMAGE}
