@@ -47,7 +47,7 @@ services:
                 tag: ${LOG_OPT_TAG_PREFIX}.efk.kibana
 
     fluentd:
-            build: ./fluentd
+        build: ./fluentd
         ports:
             - 127.0.0.1:24224:24224
             - 8080:24224
